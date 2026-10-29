@@ -27,6 +27,5 @@ Enterprise teams spend an average of 4.5 hours manually reviewing Master Service
 
 ---
 
-## 👥 Team Mission X
-- **Bonthu Praveen** — System Architect & AI Core
-- **Hari Sri Lahari** — Frontend & Product Lead
+## 👤 Author & Builder
+- **Bonthu Praveen** — End-to-End System Architect, AI Core & Full-Stack Developer
