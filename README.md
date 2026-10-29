@@ -9,6 +9,7 @@
 Enterprise teams spend an average of 4.5 hours manually reviewing Master Service Agreements (MSAs) and vendor contracts. Over 68% of small-to-midsize businesses unknowingly sign agreements containing uncapped indemnification, broad IP expropriation, and asymmetric liability caps.
 
 **DocuClear AI** parses complex enterprise legal documents in seconds, flags hidden liabilities through an interactive **Red-Flag Heatmap**, and generates balanced, legally protective counter-clauses with one-click export.
+- 📖 **Technical Architecture Deep-Dive:** [Read on Dev.to](https://dev.to/bonthupraveen1/building-docuclear-ai-autonomous-enterprise-contract-risk-auditor-real-time-redline-engine-5gef)
 
 ---
 
