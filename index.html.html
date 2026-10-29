@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuClear AI - Enterprise Contract Risk Auditor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111827;
+      --surface-border: #1f293d;
+      --surface-hover: #1a2336;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.12);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.12);
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.12);
+      --accent: #8b5cf6;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .brand-title { font-weight: 700; font-size: 1.15rem; letter-spacing: -0.02em; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+    }
+    .badge-critical { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
+    .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning); }
+    .badge-safe { background: var(--success-bg); color: var(--success); border: 1px solid var(--success); }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+    .stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+    .stat-val { font-size: 2.2rem; font-weight: 700; margin-top: 0.5rem; font-family: var(--font-mono); }
+    .controls-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.7rem 1.4rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--surface-border);
+      color: var(--text);
+    }
+    .btn-secondary:hover { background: var(--surface-hover); }
+    .btn-success { background: var(--success); }
+    .btn-success:hover { background: #059669; }
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      flex: 1;
+    }
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--surface-border);
+      padding-bottom: 0.75rem;
+    }
+    .panel-title { font-size: 1.05rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+    .clause-card {
+      background: #0d131f;
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s ease;
+    }
+    .clause-card.critical { border-left: 4px solid var(--danger); }
+    .clause-card.warning { border-left: 4px solid var(--warning); }
+    .clause-card.safe { border-left: 4px solid var(--success); }
+    .clause-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+    .clause-name { font-weight: 600; font-size: 0.95rem; }
+    .clause-text {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+      background: rgba(0,0,0,0.25);
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-top: 0.5rem;
+    }
+    .redline-text {
+      color: var(--success);
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px dashed rgba(16, 185, 129, 0.3);
+    }
+    .status-toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--surface);
+      border: 1px solid var(--primary);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 100;
+    }
+    @media (max-width: 900px) {
+      .dashboard-grid { grid-template-columns: 1fr 1fr; }
+      .workspace-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">D</div>
+      <div>
+        <div class="brand-title">DocuClear AI</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted);">Autonomous Legal Risk Auditor</div>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <span class="badge badge-safe">Azure GPT-4o Connected</span>
+      <span style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-mono);">ZDR Private Cloud</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card controls-card">
+      <div>
+        <h2 style="font-size: 1.2rem; margin-bottom: 0.25rem;">Active Contract: Vendor_Master_Services_Agreement_2026.pdf</h2>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Ingested via Azure Document Intelligence | Clause Hierarchy Preserved</p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="btn" id="auditBtn" onclick="runAudit()">⚡ Run Live Contract Audit</button>
+        <button class="btn btn-success" id="acceptBtn" onclick="acceptAllHighRisks()" style="display: none;">✓ Apply All Balanced Redlines</button>
+        <button class="btn btn-secondary" onclick="exportReport()">📄 Export Audit Memorandum</button>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="card">
+        <div class="stat-label">AGGREGATE RISK SCORE</div>
+        <div class="stat-val" id="riskScore" style="color: var(--danger);">88 / 100</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">CRITICAL TOXIC CLAUSES</div>
+        <div class="stat-val" id="criticalCount" style="color: var(--danger);">2</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">WARNING / AMBIGUOUS TERMS</div>
+        <div class="stat-val" style="color: var(--warning);">1</div>
+      </div>
+      <div class="card">
+        <div class="stat-label">LLM TEMPERATURE</div>
+        <div class="stat-val" style="color: var(--primary);">0.1 <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: normal;">(Strict)</span></div>
+      </div>
+    </div>
+
+    <div class="workspace-grid">
+      <!-- Original Clause Audits -->
+      <div class="card">
+        <div class="panel-header">
+          <div class="panel-title">Original Flagged Clauses (Audit Heatmap)</div>
+          <span class="badge badge-critical" id="statusBadge">Requires Review</span>
+        </div>
+        
+        <div class="clause-card critical">
+          <div class="clause-card-header">
+            <span class="clause-name">Section 8.2: Indemnification Scope</span>
+            <span class="badge badge-critical">CRITICAL RISK</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--danger); margin-bottom: 0.5rem;">
+            Issue: Unilateral, uncapped indemnity covering indirect/consequential damages without insurance boundary caps.
+          </p>
+          <div class="clause-text">
+            "Vendor shall defend, indemnify, and hold harmless Customer against any and all claims, losses, damages, or lost profits without limitation, regardless of cause or liability caps."
+          </div>
+        </div>
+
+        <div class="clause-card critical">
+          <div class="clause-card-header">
+            <span class="clause-name">Section 19.4: IP & Derivative Works</span>
+            <span class="badge badge-critical">CRITICAL RISK</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--danger); margin-bottom: 0.5rem;">
+            Issue: Immediate expropriation of pre-existing background code and reusable developer tooling.
+          </p>
+          <div class="clause-text">
+            "All software, scripts, workflows, and inventions generated or utilized in connection with the Services shall be the sole and exclusive property of Customer."
+          </div>
+        </div>
+
+        <div class="clause-card warning">
+          <div class="clause-card-header">
+            <span class="clause-name">Section 14.1: Net Payment Terms</span>
+            <span class="badge badge-warning">WARNING</span>
+          </div>
+          <p style="font-size: 0.85rem; color: var(--warning); margin-bottom: 0.5rem;">
+            Issue: Unilateral 90-day settlement period without statutory late interest enforcement.
+          </p>
+          <div class="clause-text">
+            "Undisputed invoices shall be settled Net 90 calendar days from invoice presentation."
+          </div>
+        </div>
+      </div>
+
+      <!-- Balanced Redline Generation -->
+      <div class="card">
+        <div class="panel-header">
+          <div class="panel-title">Generated Balanced Redlines (Pydantic Schema Output)</div>
+          <button class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="copyRedlines()">Copy All</button>
+        </div>
+
+        <div id="redlineContainer">
+          <div style="padding: 3rem 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+            Click <strong>"Run Live Contract Audit"</strong> to compute deterministic counter-clauses.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="status-toast">Memorandum generated!</div>
+
+  <script>
+    function runAudit() {
+      const btn = document.getElementById('auditBtn');
+      btn.innerText = 'Analyzing Layout & Schemas...';
+      btn.style.opacity = '0.7';
+
+      setTimeout(() => {
+        btn.innerText = '✓ Audit Completed';
+        btn.style.opacity = '1';
+        document.getElementById('acceptBtn').style.display = 'inline-flex';
+
+        const container = document.getElementById('redlineContainer');
+        container.innerHTML = `
+          <div class="clause-card safe">
+            <div class="clause-card-header">
+              <span class="clause-name">Counter-Clause 8.2 (Mutual Standard)</span>
+              <span class="badge badge-safe">BALANCED REDLINE</span>
+            </div>
+            <div class="clause-text redline-text">
+              "Each Party shall mutually defend and indemnify the other solely against third-party claims arising from gross negligence or willful misconduct, capped strictly at the aggregate fees paid in the trailing twelve (12) months."
+            </div>
+          </div>
+
+          <div class="clause-card safe">
+            <div class="clause-card-header">
+              <span class="clause-name">Counter-Clause 19.4 (Background IP Retention)</span>
+              <span class="badge badge-safe">BALANCED REDLINE</span>
+            </div>
+            <div class="clause-text redline-text">
+              "Customer owns bespoke deliverables; Vendor retains all right, title, and interest in pre-existing tooling, background libraries, and generalized domain utilities."
+            </div>
+          </div>
+        `;
+        showToast("Audit complete: 2 critical traps flagged.");
+      }, 700);
+    }
+
+    function acceptAllHighRisks() {
+      document.getElementById('riskScore').innerText = '16 / 100';
+      document.getElementById('riskScore').style.color = 'var(--success)';
+      document.getElementById('criticalCount').innerText = '0';
+      document.getElementById('criticalCount').style.color = 'var(--success)';
+      document.getElementById('statusBadge').className = 'badge badge-safe';
+      document.getElementById('statusBadge').innerText = 'PROTECTED';
+      showToast("Applied counter-clauses! Aggregate risk reduced to 16/100.");
+    }
+
+    function copyRedlines() {
+      navigator.clipboard.writeText("Mutual indemnity capped at trailing 12 months fees. Background IP and general tooling retained by Vendor.");
+      showToast("Counter-clauses copied to clipboard!");
+    }
+
+    function exportReport() {
+      window.print();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+  </script>
+</body>
+</html>
